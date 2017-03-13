@@ -7,61 +7,60 @@ import * as mkdirp from 'mkdirp';
 
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
 
-function buildNewStream(newStream, streamName) {
-	return async function() {
-
-		const streamFile = `${STREAMS_ROOT}/${streamName}.${newStream.mode}`;
-		let fileExists: boolean = fs.existsSync(streamFile);
-
-		if(!fileExists) {
-
-			mkdirp.sync(STREAMS_ROOT);
-			fs.writeFileSync(streamFile, newStream.text);
-
-			const document = await vscode.workspace.openTextDocument(streamFile);
-
-			vscode.window.showTextDocument(document, vscode.ViewColumn.Two)
-			.then(() => {
-				// const content = new vscode.WorkspaceEdit()
-				// content.set(document.uri, [new vscode.TextEdit(new vscode.Range(0,0,0,0), newStream.text)]);
-				// vscode.workspace.applyEdit(content);
-			});
-
-				vscode.workspace.onDidChangeTextDocument((event) => {
-
-					const doc = event.document;
-					if(path.basename(doc.fileName) === `${streamName}.${newStream.mode}`) {
-						console.log(doc.fileName, doc.getText());
-						firebase.database().ref(`/streams/${streamName}`).update({ text: doc.getText() });
-					}
-				});
-		}
-	}
-}
-
-export default function start(streamName): Promise<{}> {
+export default function start(streamName, streamContent?, streamMode?): Promise<{}> {
 
 
 	const promise = new Promise((resolve, reject) => {
 
-			const newStream = {
-				mode: 'js',
-				text: '// Welcome to your new stream...\n',
-				fileName: streamName
+		buildNewStream(streamName, streamContent, streamMode)()
+		.then(() => {
+			resolve({});
+		})
+		.catch((err: any ) => {
+			switch(err.code) {
+				case 'PERMISSION_DENIED':
+				reject({ message: `A stream with the name: ${streamName} exists.`})
+				break;
+				default:
+				console.log(err);
+				reject({ message: 'There was an error joining the stream, try again.'})
 			}
+		});
+	})
+	return promise;
+}
 
-			firebase.database().ref(`/streams/${streamName}`).set(newStream)
-			.then(buildNewStream(newStream, streamName))
-			.catch((err: any ) => {
-				switch(err.code) {
-					case 'PERMISSION_DENIED':
-						reject({ message: `A stream with the name: ${streamName} exists.`})
-						break;
-					default:
-						console.log(err);
-						reject({ message: 'There was an error joining the stream, try again.'})
+function buildNewStream(
+	streamName,
+	streamContent = '// Welcome to your new stream...\n',
+	streamMode = '.js'
+	) {
+	let document;
+	const STREAM_PREFIX = 'stream-'
+	return async function() {
+
+		const streamFile = `${STREAMS_ROOT}/${STREAM_PREFIX}${streamName}${streamMode ? streamMode : ''}`;
+		let fileExists: boolean = fs.existsSync(streamFile);
+
+		if(!fileExists) {
+			mkdirp.sync(STREAMS_ROOT);
+			fs.writeFileSync(streamFile, streamContent);
+
+			document = await vscode.workspace.openTextDocument(streamFile);
+			vscode.window.showTextDocument(document, vscode.ViewColumn.Two)
+
+			const FirebaseFriendlyRefName = streamName.replace(/[^0-9a-zA-Z]/g, '');
+
+			vscode.workspace.onDidChangeTextDocument((event) => {
+				if(event.document.fileName === document.fileName) {
+					firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).update({ text: document.getText() });
 				}
 			});
-	});
-	return promise;
+
+			return firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).set({ 
+				text: document.getText(),
+				localStreamFileName: path.basename(document.fileName),
+			});
+		}
+	}
 }

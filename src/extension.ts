@@ -4,8 +4,10 @@
 import * as vscode from 'vscode';
 import * as firebase from 'firebase';
 
-import joinSession from './actions/join-session';
-import startSession from './actions/start-session';
+import joinSession from './actions/join-stream';
+import startStream from './actions/start-stream';
+import startStreamFromFile from './actions/start-file-stream';
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -26,7 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Codemo extension is active!');
 
     context.subscriptions.push(joinSession(context));
-    context.subscriptions.push(startSession(context));
+    context.subscriptions.push(startStream(context));
+    context.subscriptions.push(startStreamFromFile(context))
 
 }
 

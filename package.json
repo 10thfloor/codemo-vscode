@@ -11,19 +11,24 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.codemoJoinSession",
-    "onCommand:extension.codemoStartSession"
+    "onCommand:extension.codemoJoinStream",
+    "onCommand:extension.codemoStartStream",
+    "onCommand:extension.codemoStartStreamFromFile"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
       {
-        "command": "extension.codemoJoinSession",
-        "title": "Codemo: Join a Codemo Session"
+        "command": "extension.codemoJoinStream",
+        "title": "Codemo: Join a Codemo Stream"
       },
       {
-        "command": "extension.codemoStartSession",
-        "title": "Codemo: Start a Codemo Session"
+        "command": "extension.codemoStartStream",
+        "title": "Codemo: Start a new Codemo Stream"
+      },
+       {
+        "command": "extension.codemoStartStreamFromFile",
+        "title": "Codemo: Stream this file"
       }
     ]
   },

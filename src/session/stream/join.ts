@@ -3,8 +3,12 @@ import * as firebase from 'firebase';
 import StreamContentProvider from './stream-content-provider';
 
 export default function join(streamName): Promise<{}> {
+
+		const provider = new StreamContentProvider();
+
 		const promise = new Promise((resolve, reject) => {
-			const streamData = firebase.database().ref(`/streams/${streamName}`)
+			const streamData = firebase.database().ref(`/streams/${streamName}`);
+
 
 			streamData.once('value').then((stream) => {
 
@@ -16,7 +20,6 @@ export default function join(streamName): Promise<{}> {
 				const streamContent = stream.val().text;
 				const codemoStream = vscode.Uri.parse(`codemo-stream://authority/${streamName}/codemo-stream.js`);
 
-				const provider = new StreamContentProvider();
 				provider.steamContentText = streamContent;
 
 				vscode.workspace.registerTextDocumentContentProvider('codemo-stream', provider);
@@ -27,15 +30,15 @@ export default function join(streamName): Promise<{}> {
 					provider.steamContentText = stream.val().text;
 					provider.update(codemoStream);
 				});
-				resolve({})
-			})
-			.catch((err: any) => {
+
+				resolve({});
+			}).catch((err: any) => {
 				switch(err.code) {
 					case 'PERMISSION_DENIED':
 						reject({ message: 'You don\'t have access to this stream, please sign in to Codemo!'})
 						break;
 					default:
-					  reject({ message: 'There was an error joining the stream, try again.'})
+					  	reject({ message: 'There was an error joining the stream, try again.'})
 				}
 			});
 		});
