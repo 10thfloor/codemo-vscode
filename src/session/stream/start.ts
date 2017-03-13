@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 
+import StreamEdit from './lib/stream-edit-factory';
+
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
 
 export default function start(streamName, streamContent?, streamMode?): Promise<{}> {
@@ -53,13 +55,20 @@ function buildNewStream(
 
 			vscode.workspace.onDidChangeTextDocument((event) => {
 				if(event.document.fileName === document.fileName) {
-					firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).update({ text: document.getText() });
+					const edit = event.contentChanges[0];
+					firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`)
+							.update({
+								text: document.getText() ,
+								lastEdit: StreamEdit.save(edit)
+							});
+
 				}
 			});
 
-			return firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).set({ 
+			return firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).set({
 				text: document.getText(),
 				localStreamFileName: path.basename(document.fileName),
+				lastEdit: StreamEdit.init(document)
 			});
 		}
 	}

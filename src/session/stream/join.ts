@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as firebase from 'firebase';
-import StreamContentProvider from './stream-content-provider';
+
+import StreamContentProvider from './lib/stream-content-provider';
+import StreamEdit from './lib/stream-edit-factory';
 
 export default function join(streamName): Promise<{}> {
 
@@ -27,8 +29,10 @@ export default function join(streamName): Promise<{}> {
 				provider.update(codemoStream);
 
 				streamData.on('value', function(stream) {
-					provider.steamContentText = stream.val().text;
-					provider.update(codemoStream);
+					const lastEdit = stream.val().lastEdit;
+					const edit = new vscode.WorkspaceEdit();
+    				edit.set(codemoStream, [StreamEdit.create(lastEdit)]);
+					vscode.workspace.applyEdit(edit);
 				});
 
 				resolve({});

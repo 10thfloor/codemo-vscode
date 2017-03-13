@@ -26,7 +26,7 @@ export default function startFromFile(context): Promise<{}> {
 		.then(() => {
 			resolve({})
 		}).catch((err) => {
-			console.log(err);
+			reject({ message: err });
 		})
 	});
 	return promise;
