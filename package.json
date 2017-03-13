@@ -1,0 +1,47 @@
+{
+  "name": "codemo-vscode",
+  "displayName": "codemo-vscode",
+  "description": "Code collaboratively without a cloud-based IDE.",
+  "version": "0.0.1",
+  "publisher": "10thfloor",
+  "engines": {
+    "vscode": "^1.10.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.codemoJoinSession",
+    "onCommand:extension.codemoStartSession"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.codemoJoinSession",
+        "title": "Codemo: Join a Codemo Session"
+      },
+      {
+        "command": "extension.codemoStartSession",
+        "title": "Codemo: Start a Codemo Session"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0",
+    "mocha": "^2.3.3",
+    "@types/node": "^6.0.40",
+    "@types/mocha": "^2.2.32"
+  },
+  "dependencies": {
+    "firebase": "^3.7.1",
+    "mkdirp": "^0.5.1"
+  }
+}
