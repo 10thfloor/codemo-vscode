@@ -68,7 +68,7 @@ function buildNewStream(
 			return firebase.database().ref(`/streams/${FirebaseFriendlyRefName}`).set({
 				text: document.getText(),
 				localStreamFileName: path.basename(document.fileName),
-				lastEdit: StreamEdit.init(document)
+				lastEdit: StreamEdit.init(document);
 			});
 		}
 	}
