@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export default class TextDocumentContentProvider implements vscode.TextDocumentContentProvider {
 
-    private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
+    private _onDidChange = new vscode.EventEmitter < vscode.Uri > ();
     private streamContent: string;
 
     public provideTextDocumentContent(uri: vscode.Uri): string {

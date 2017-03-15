@@ -9,7 +9,7 @@ class RecentlyClosed {
 	}
 
 	public add(streamName) {
-		if(this.closed.length === this.max) {
+		if (this.closed.length === this.max) {
 			this.closed.pop();
 			this.closed.push(streamName);
 		} else {

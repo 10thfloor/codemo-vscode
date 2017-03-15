@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 class StreamEditFactory {
 
 	init(document) {
-		const initEdit = new vscode.TextEdit(new vscode.Range(0,0,0,0), document.getText());
+		const initEdit = new vscode.TextEdit(new vscode.Range(0, 0, 0, 0), document.getText());
 		return this.save(initEdit);
 	}
 
