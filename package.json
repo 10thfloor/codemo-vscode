@@ -13,7 +13,8 @@
   "activationEvents": [
     "onCommand:extension.codemoJoinStream",
     "onCommand:extension.codemoStartStream",
-    "onCommand:extension.codemoStartStreamFromFile"
+    "onCommand:extension.codemoStartStreamFromFile",
+	"onCommand:extension.codemoLogin"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -29,6 +30,10 @@
        {
         "command": "extension.codemoStartStreamFromFile",
         "title": "Codemo: Stream this file"
+      },
+	   {
+        "command": "extension.codemoLogin",
+        "title": "Codemo: Login to Codemo"
       }
     ]
   },

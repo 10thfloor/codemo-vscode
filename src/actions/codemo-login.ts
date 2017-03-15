@@ -6,16 +6,12 @@ import * as firebase from 'firebase';
 import Codemo from '../codemo';
 
 export default function (context) {
-	const command = vscode.commands.registerCommand('extension.codemoTakeoverStream', () => {
-
-	});
-
-	vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-
-	});
-
-	vscode.window.onDidChangeVisibleTextEditors((editors: vscode.TextEditor[]) => {
-
+	const command = vscode.commands.registerCommand('extension.codemoLogin', async() => {
+		try {
+			await Codemo.login();
+		} catch (err) {
+			vscode.window.showErrorMessage(err.message);
+		}
 	});
 
 	return command;
