@@ -60,7 +60,7 @@ function buildNewStream(
 				vscode.workspace.onDidChangeTextDocument((event) => {
 					if (event.document.fileName === document.fileName) {
 						const edit = event.contentChanges[0];
-						firebase.database().ref(`/streams/${stream.name()}`)
+						firebase.database().ref(`/streams/${stream.key}`)
 							.update({
 								text: document.getText(),
 								lastEdit: StreamEdit.save(edit)

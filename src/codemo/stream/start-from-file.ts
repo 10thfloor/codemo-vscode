@@ -33,7 +33,7 @@ export default function startFromFile(context): Promise < {} > {
 			vscode.workspace.onDidChangeTextDocument((event) => {
 				if (event.document.fileName === streamFile.fileName) {
 					const edit = event.contentChanges[0];
-					firebase.database().ref(`/streams/${stream.name()}`)
+					firebase.database().ref(`/streams/${stream.key}`)
 						.update({
 							text: streamFile.getText(),
 							lastEdit: StreamEdit.save(edit)

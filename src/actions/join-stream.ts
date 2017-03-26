@@ -7,7 +7,7 @@ import Codemo from '../codemo';
 
 export default function (context) {
 	const command = vscode.commands.registerCommand('extension.codemoJoinStream', () => {
-		vscode.window.showInformationMessage('One moment...')
+
 		const streamData = firebase.database().ref('/streams');
 		streamData.once('value', (streams) => {
 			if (streams.hasChildren()) {
