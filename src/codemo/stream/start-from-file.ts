@@ -32,7 +32,6 @@ export default function startFromFile(context): Promise < {} > {
 		return firebase.database().ref(`/streams`).push({
 			text: streamFile.getText(),
 			localStreamFileName: path.basename(streamFile.fileName),
-			lastEdit: StreamEdit.init(streamFile)
 		}).then((stream) => {
 
 			vscode.window.showInformationMessage(`OK, your're streaming this file!`);
@@ -56,7 +55,7 @@ export default function startFromFile(context): Promise < {} > {
 				lastEdit = stream.val().lastEdit;
 				const edit = new vscode.WorkspaceEdit();
 				const editor = getEditor(streamFile.fileName);
-				if(editor) {
+				if(editor && lastEdit.user !== firebase.auth().currentUser.uid) {
 					edit.set(editor, [StreamEdit.create(lastEdit)])
 					await vscode.workspace.applyEdit(edit);
 				}

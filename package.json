@@ -14,7 +14,8 @@
     "onCommand:extension.codemoJoinStream",
     "onCommand:extension.codemoStartStream",
     "onCommand:extension.codemoStartStreamFromFile",
-    "onCommand:extension.codemoLogin"
+    "onCommand:extension.codemoLogin",
+	"onCommand:extension.codemoLogout"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -30,6 +31,10 @@
       {
         "command": "extension.codemoLogin",
         "title": "Codemo: Login to Codemo"
+      },
+	  {
+        "command": "extension.codemoLogout",
+        "title": "Codemo: Log out of Codemo"
       }
     ]
   },

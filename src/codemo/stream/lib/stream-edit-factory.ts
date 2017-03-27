@@ -1,11 +1,7 @@
 import * as vscode from 'vscode';
+import * as firebase from 'firebase';
 
 class StreamEditFactory {
-
-	init(document) {
-		const initEdit = new vscode.TextEdit(new vscode.Range(0, 0, 0, 0), document.getText());
-		return this.save(initEdit);
-	}
 
 	save(edit) {
 		return {
@@ -19,7 +15,8 @@ class StreamEditFactory {
 					character: edit.range.end.character,
 					line: edit.range.end.line
 				}
-			}
+			},
+			user: firebase.auth().currentUser.uid
 		}
 	}
 

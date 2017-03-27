@@ -4,7 +4,9 @@
 import * as vscode from 'vscode';
 import * as firebase from 'firebase';
 
-import codemoLogin from './actions/codemo-login';
+import { login as codemoLogin } from './actions/codemo-auth';
+import { logout as codemoLogout } from './actions/codemo-auth'
+
 import joinStream from './actions/join-stream';
 import startStream from './actions/start-stream';
 import startFileStream from './actions/start-file-stream';
@@ -28,8 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
 	firebase.initializeApp(config);
 
 	context.subscriptions.push(codemoLogin(context));
+	context.subscriptions.push(codemoLogout(context));
+
 	context.subscriptions.push(joinStream(context));
-	// context.subscriptions.push(startStream(context));
 	context.subscriptions.push(startFileStream(context))
 	context.subscriptions.push(controlStream(context));
 	context.subscriptions.push(takeoverStream(context));

@@ -73,7 +73,7 @@ export default function join(streamId, streamFileName): Promise < {} > {
 				lastEdit = stream.val().lastEdit;
 				const edit = new vscode.WorkspaceEdit();
 				const editor = getEditor(codemoStream);
-				if(editor) {
+				if(editor && lastEdit.user !== firebase.auth().currentUser.uid) {
 					edit.set(editor, [StreamEdit.create(lastEdit)])
 					await vscode.workspace.applyEdit(edit);
 				}
