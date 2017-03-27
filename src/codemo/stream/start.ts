@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 
+import * as vinyl from 'vinyl';
+
 import StreamEdit from './lib/stream-edit-factory';
 
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
@@ -42,7 +44,7 @@ function buildNewStream(
 
 	return async function () {
 
-		const streamFile = `${STREAMS_ROOT}/${STREAM_PREFIX}${streamName}${streamMode ? streamMode : ''}`;
+		const streamFile = `${STREAMS_ROOT}/${streamName}${streamMode}#codemo-stream`;
 		let fileExists: boolean = fs.existsSync(streamFile);
 
 		if (!fileExists) {
@@ -55,7 +57,6 @@ function buildNewStream(
 			return firebase.database().ref(`/streams`).push({
 				text: document.getText(),
 				localStreamFileName: path.basename(document.fileName),
-				lastEdit: StreamEdit.init(document)
 			}).then((stream) => {
 				vscode.workspace.onDidChangeTextDocument((event) => {
 					if (event.document.fileName === document.fileName) {

@@ -28,7 +28,7 @@ export default function startFromFile(context): Promise < {} > {
 			lastEdit: StreamEdit.init(streamFile)
 		}).then((stream) => {
 
-			vscode.window.showInformationMessage(`Your're streaming this file!`);
+			vscode.window.showInformationMessage(`OK, your're streaming this file!`);
 
 			vscode.workspace.onDidChangeTextDocument((event) => {
 				if (event.document.fileName === streamFile.fileName) {

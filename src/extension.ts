@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(codemoLogin(context));
 	context.subscriptions.push(joinStream(context));
-	context.subscriptions.push(startStream(context));
+	// context.subscriptions.push(startStream(context));
 	context.subscriptions.push(startFileStream(context))
 	context.subscriptions.push(controlStream(context));
 	context.subscriptions.push(takeoverStream(context));
