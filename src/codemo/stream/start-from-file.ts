@@ -10,7 +10,7 @@ import StreamEdit from './lib/stream-edit-factory';
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
 const FirebaseFriendlyRefName = (streamName) => streamName.replace(/[^0-9a-zA-Z]/g, '');
 
-function getStreamingEditorUri(fileName) {
+function getEditor(fileName) {
 	const editor = vscode.window.visibleTextEditors.filter(editor => {
 		return editor.document.uri.path === fileName;
 	});
@@ -38,17 +38,7 @@ export default function startFromFile(context): Promise < {} > {
 			vscode.window.showInformationMessage(`OK, your're streaming this file!`);
 			const streamData = firebase.database().ref(`/streams/${stream.key}`);
 
-			let lastEdit;
-			streamData.on('value', function (stream) {
-				lastEdit = stream.val().lastEdit;
-				const edit = new vscode.WorkspaceEdit();
-				const editor = getStreamingEditorUri(streamFile.fileName);
-				editor && edit.set(editor, [StreamEdit.create(lastEdit)])
-					   && vscode.workspace.applyEdit(edit);
-			});
-
-
-			vscode.workspace.onDidChangeTextDocument((event) => {
+			const changeListenerFunction = (event) => {
 				if (event.document === streamFile) {
 					const edit = event.contentChanges[0];
 					firebase.database().ref(`/streams/${stream.key}`)
@@ -56,6 +46,19 @@ export default function startFromFile(context): Promise < {} > {
 							text: streamFile.getText(),
 							lastEdit: StreamEdit.save(edit)
 						});
+				}
+			};
+
+			let changeListener = vscode.workspace.onDidChangeTextDocument(changeListenerFunction)
+
+			let lastEdit;
+			streamData.on('value', async function(stream) {
+				lastEdit = stream.val().lastEdit;
+				const edit = new vscode.WorkspaceEdit();
+				const editor = getEditor(streamFile.fileName);
+				if(editor) {
+					edit.set(editor, [StreamEdit.create(lastEdit)])
+					await vscode.workspace.applyEdit(edit);
 				}
 			});
 		})

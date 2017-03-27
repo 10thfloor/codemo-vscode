@@ -9,14 +9,9 @@ import StreamEdit from './lib/stream-edit-factory';
 
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
 
-function getStreamEditor(document, cb) {
-	const editor = vscode.window.visibleTextEditors.filter(editor => editor.document === document);
-	cb(editor[0]);
-}
-
-function getStreamingEditorUri(streamEditor, fileName) {
+function getEditor(streamEditor) {
 	const editor = vscode.window.visibleTextEditors.filter(editor => {
-		return editor.document.uri.path !== streamEditor.fileName;
+		return editor.document.uri.path === streamEditor.fileName;
 	});
 	return editor.length && editor[0].document.uri;
 }
@@ -60,41 +55,27 @@ export default function join(streamId, streamFileName): Promise < {} > {
 			const codemoStream = document;
 			vscode.window.showTextDocument(document, vscode.ViewColumn.Three);
 
-
-			let lastEdit;
-			streamData.on('value', function (stream) {
-				lastEdit = stream.val().lastEdit;
-				const edit = new vscode.WorkspaceEdit();
-				const editor = getStreamingEditorUri(codemoStream, stream);
-				editor && edit.set(editor, [StreamEdit.create(lastEdit)])
-					   && vscode.workspace.applyEdit(edit);
-			});
-
-			vscode.workspace.onDidChangeTextDocument((event) => {
+			const changeListenerFunction = (event) => {
 				if (event.document === codemoStream) {
-					// getStreamEditor(codemoStream, (editor: vscode.TextEditor) => {
-					// 	if (!editor) return;
-					// 	const line = event.document.lineAt(lastEdit.range.end.line).range;
-					// 	editor.setDecorations(
-					// 		lineDecoration,
-					// 		lineDecorationOptions(line),
-					// 	)
-					// });
-				} else {
-					// getStreamEditor(codemoStream, (editor: vscode.TextEditor) => {
-					// 	if (!editor) return;
-					// 	const line = event.document.lineAt(lastEdit.range.end.line).range;
-					// 	editor.setDecorations(
-					// 		lineDecoration,
-					// 		lineDecorationOptions(line),
-					// 	)
-					// });
 					const edit = event.contentChanges[0];
 					firebase.database().ref(`/streams/${stream.key}`)
 						.update({
 						text: codemoStream.getText(),
 						lastEdit: StreamEdit.save(edit)
-					});
+					})
+				}
+			}
+
+			let changeListener = vscode.workspace.onDidChangeTextDocument(changeListenerFunction);
+
+			let lastEdit;
+			streamData.on('value', async function (stream) {
+				lastEdit = stream.val().lastEdit;
+				const edit = new vscode.WorkspaceEdit();
+				const editor = getEditor(codemoStream);
+				if(editor) {
+					edit.set(editor, [StreamEdit.create(lastEdit)])
+					await vscode.workspace.applyEdit(edit);
 				}
 			});
 
