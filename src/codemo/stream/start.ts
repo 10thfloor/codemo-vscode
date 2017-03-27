@@ -52,7 +52,7 @@ function buildNewStream(
 			fs.writeFileSync(streamFile, streamContent);
 
 			document = await vscode.workspace.openTextDocument(streamFile);
-			vscode.window.showTextDocument(document, vscode.ViewColumn.Two);
+			vscode.window.showTextDocument(document, vscode.ViewColumn.Three);
 
 			return firebase.database().ref(`/streams`).push({
 				text: document.getText(),
