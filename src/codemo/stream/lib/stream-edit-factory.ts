@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as firebase from 'firebase';
+import * as md5 from 'md5';
 
 class StreamEditFactory {
 
 	save(edit) {
-		return {
+		const output = {
 			text: edit.newText || edit.text,
 			range: {
 				start: {
@@ -16,8 +17,15 @@ class StreamEditFactory {
 					line: edit.range.end.line
 				}
 			},
-			user: firebase.auth().currentUser.uid
-		}
+			user: firebase.auth().currentUser.uid,
+			hash: ''
+		};
+
+		const hash = md5(JSON.stringify(output));
+
+		output.hash = hash;
+
+		return output;
 	}
 
 	create(edit) {
