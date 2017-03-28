@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 
 import StreamEdit from './lib/stream-edit-factory';
+import StreamEventHandler from './lib/event-handlers';
 
 const STREAMS_ROOT = `${vscode.workspace.rootPath}/.codemo-streams`;
 const FirebaseFriendlyRefName = (streamName) => streamName.replace(/[^0-9a-zA-Z]/g, '');
@@ -37,36 +38,40 @@ export default function startFromFile(context): Promise < {} > {
 			vscode.window.showInformationMessage(`OK, your're streaming this file!`);
 			const streamData = firebase.database().ref(`/streams/${stream.key}`);
 
-			let thisEdit, localHash;
-			const changeListenerFunction = (event) => {
-				if (event.document === streamFile) {
-					const edit = event.contentChanges[0];
+			const eventHandlers = new StreamEventHandler({ document: streamFile, stream });
 
-					thisEdit = StreamEdit.save(edit);
-					localHash = thisEdit.hash
 
-					if (localHash !== lastEdit.hash) {
-						firebase.database().ref(`/streams/${stream.key}`)
-							.update({
-							text: streamFile.getText(),
-							lastEdit: thisEdit
-						})
-					}
-				}
-			}
+			// let localEdit;
+			// const changeListenerFunction = (event) => {
+			// 	if (event.document !== streamFile) return;
 
-			let changeListener = vscode.workspace.onDidChangeTextDocument(changeListenerFunction)
+			// 	const edit = event.contentChanges[0];
+			// 	localEdit = StreamEdit.save(edit);
 
-			let lastEdit;
-			streamData.on('value', async function(stream) {
-				lastEdit = stream.val().lastEdit;
-				const edit = new vscode.WorkspaceEdit();
-				const editor = getEditor(streamFile.fileName);
-				if(editor && lastEdit && lastEdit.hash !== localHash) {
-					edit.set(editor, [StreamEdit.create(lastEdit)])
-					await vscode.workspace.applyEdit(edit);
-				}
-			});
+			// 	if (localEdit.hash !== remoteEdit.hash) {
+			// 		firebase.database().ref(`/streams/${stream.key}`)
+			// 			.update({
+			// 			text: streamFile.getText(),
+			// 			lastEdit: localEdit
+			// 		})
+			// 	}
+			// }
+
+			let changeListener = vscode.workspace.onDidChangeTextDocument(eventHandlers.onEditorTextChange.bind(eventHandlers));
+			streamData.on('value', eventHandlers.onStreamData);
+
+			// let remoteEdit;
+			// streamData.on('value', async function(stream) {
+			// 	remoteEdit = stream.val().lastEdit || { hash: null };
+
+			// 	const edit = new vscode.WorkspaceEdit();
+			// 	const editor = getEditor(streamFile.fileName);
+
+			// 	if(editor && remoteEdit.hash && remoteEdit.hash !== localEdit.hash) {
+			// 		edit.set(editor, [StreamEdit.create(remoteEdit)])
+			// 		await vscode.workspace.applyEdit(edit);
+			// 	}
+			// });
 		})
 	});
 	return promise;
