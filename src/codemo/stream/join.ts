@@ -55,12 +55,15 @@ export default function join(streamId, streamFileName): Promise < {} > {
 			const codemoStream = document;
 			vscode.window.showTextDocument(document, vscode.ViewColumn.Three);
 
+			let thisEdit, localHash;
 			const changeListenerFunction = (event) => {
 				if (event.document === codemoStream) {
 					const edit = event.contentChanges[0];
-					const thisEdit = StreamEdit.save(edit);
 
-					if (thisEdit.hash !== lastEdit.hash && lastEdit.user === firebase.auth().currentUser.uid) {
+					thisEdit = StreamEdit.save(edit);
+					localHash = thisEdit.hash;
+
+					if (localHash !== lastEdit.hash) {
 						firebase.database().ref(`/streams/${stream.key}`)
 							.update({
 							text: codemoStream.getText(),
@@ -78,10 +81,7 @@ export default function join(streamId, streamFileName): Promise < {} > {
 				const edit = new vscode.WorkspaceEdit();
 				const editor = getEditor(codemoStream);
 
-				console.log(firebase.auth().currentUser.uid);
-				console.log(lastEdit);
-
-				if(editor && lastEdit.user !== firebase.auth().currentUser.uid) {
+				if(editor && lastEdit.hash !== localHash) {
 					edit.set(editor, [StreamEdit.create(lastEdit)])
 					await vscode.workspace.applyEdit(edit);
 				}

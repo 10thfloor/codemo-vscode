@@ -6,7 +6,7 @@ export  function login(): Promise < {} > {
 	const promise = new Promise((resolve, reject) => {
 
 
-		firebase.auth().signInWithEmailAndPassword('instructor2@test.com', 'password')
+		firebase.auth().signInWithEmailAndPassword('instructor1@test.com', 'password')
 					   .then(() => resolve({ message: 'Hello instructor1. Welcome to Codemo.'}))
 					   .catch((err) => reject({ message: err }));
 
