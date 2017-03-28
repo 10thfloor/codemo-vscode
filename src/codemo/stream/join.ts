@@ -56,12 +56,11 @@ export default function join(streamId, streamFileName): Promise < {} > {
 			vscode.window.showTextDocument(document, vscode.ViewColumn.Three);
 
 			const changeListenerFunction = (event) => {
-				console.log(event);
 				if (event.document === codemoStream) {
 					const edit = event.contentChanges[0];
 					const thisEdit = StreamEdit.save(edit);
 
-					if (thisEdit.hash !== lastEdit.hash) {
+					if (thisEdit.hash !== lastEdit.hash && lastEdit.user === firebase.auth().currentUser.uid) {
 						firebase.database().ref(`/streams/${stream.key}`)
 							.update({
 							text: codemoStream.getText(),
