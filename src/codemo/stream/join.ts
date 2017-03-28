@@ -41,15 +41,11 @@ export default function join(streamId, streamFileName): Promise < {} > {
 				return;
 			}
 
-
 			const streamFile = `${STREAMS_ROOT}/${streamFileName}`;
-			let fileExists: boolean = fs.existsSync(streamFile);
+			//let fileExists: boolean = fs.existsSync(streamFile);
 
-
-			if (!fileExists) {
-				mkdirp.sync(STREAMS_ROOT);
-				fs.writeFileSync(streamFile, stream.val().text);
-			}
+			mkdirp.sync(STREAMS_ROOT);
+			fs.writeFileSync(streamFile, stream.val().text);
 
 			const document = await vscode.workspace.openTextDocument(streamFile);
 			const codemoStream = document;
