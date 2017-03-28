@@ -37,16 +37,23 @@ export default function startFromFile(context): Promise < {} > {
 			vscode.window.showInformationMessage(`OK, your're streaming this file!`);
 			const streamData = firebase.database().ref(`/streams/${stream.key}`);
 
+			let thisEdit, localHash;
 			const changeListenerFunction = (event) => {
 				if (event.document === streamFile) {
 					const edit = event.contentChanges[0];
-					firebase.database().ref(`/streams/${stream.key}`)
-						.update({
+
+					thisEdit = StreamEdit.save(edit);
+					localHash = thisEdit.hash;
+
+					if (localHash !== lastEdit.hash) {
+						firebase.database().ref(`/streams/${stream.key}`)
+							.update({
 							text: streamFile.getText(),
-							lastEdit: StreamEdit.save(edit)
-						});
+							lastEdit: thisEdit
+						})
+					}
 				}
-			};
+			}
 
 			let changeListener = vscode.workspace.onDidChangeTextDocument(changeListenerFunction)
 
@@ -55,7 +62,7 @@ export default function startFromFile(context): Promise < {} > {
 				lastEdit = stream.val().lastEdit;
 				const edit = new vscode.WorkspaceEdit();
 				const editor = getEditor(streamFile.fileName);
-				if(editor && lastEdit.user !== firebase.auth().currentUser.uid) {
+				if(editor && lastEdit.hash !== localHash) {
 					edit.set(editor, [StreamEdit.create(lastEdit)])
 					await vscode.workspace.applyEdit(edit);
 				}
