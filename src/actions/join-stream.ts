@@ -24,7 +24,7 @@ export default function (context) {
 					.then(async stream => {
 						if (!stream) return;
 						try {
-							await Codemo.join(stream.description, stream.detail);
+							await Codemo.clone(stream.description, stream.detail);
 						} catch (err) {
 							vscode.window.showErrorMessage(err.message);
 						}

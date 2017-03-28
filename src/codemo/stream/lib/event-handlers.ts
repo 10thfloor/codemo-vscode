@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as firebase from 'firebase';
 
 import StreamEdit from '../lib/stream-edit-factory';
 
@@ -21,9 +22,13 @@ class StreamEventHandler {
   codemoStream: vscode.TextDocument;
 
   constructor({document, stream}) {
+
     this.codemoStream = document;
     this.stream = stream;
-    this.onStreamData = this.onStreamData.bind(this);
+
+	this.onStreamData = this.onStreamData.bind(this);
+	this.onEditorTextChange = this.onEditorTextChange.bind(this);
+
   }
 
   getEditor() {

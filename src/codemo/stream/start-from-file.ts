@@ -39,39 +39,9 @@ export default function startFromFile(context): Promise < {} > {
 			const streamData = firebase.database().ref(`/streams/${stream.key}`);
 
 			const eventHandlers = new StreamEventHandler({ document: streamFile, stream });
-
-
-			// let localEdit;
-			// const changeListenerFunction = (event) => {
-			// 	if (event.document !== streamFile) return;
-
-			// 	const edit = event.contentChanges[0];
-			// 	localEdit = StreamEdit.save(edit);
-
-			// 	if (localEdit.hash !== remoteEdit.hash) {
-			// 		firebase.database().ref(`/streams/${stream.key}`)
-			// 			.update({
-			// 			text: streamFile.getText(),
-			// 			lastEdit: localEdit
-			// 		})
-			// 	}
-			// }
-
-			let changeListener = vscode.workspace.onDidChangeTextDocument(eventHandlers.onEditorTextChange.bind(eventHandlers));
+			let changeListener = vscode.workspace.onDidChangeTextDocument(eventHandlers.onEditorTextChange);
 			streamData.on('value', eventHandlers.onStreamData);
 
-			// let remoteEdit;
-			// streamData.on('value', async function(stream) {
-			// 	remoteEdit = stream.val().lastEdit || { hash: null };
-
-			// 	const edit = new vscode.WorkspaceEdit();
-			// 	const editor = getEditor(streamFile.fileName);
-
-			// 	if(editor && remoteEdit.hash && remoteEdit.hash !== localEdit.hash) {
-			// 		edit.set(editor, [StreamEdit.create(remoteEdit)])
-			// 		await vscode.workspace.applyEdit(edit);
-			// 	}
-			// });
 		})
 	});
 	return promise;

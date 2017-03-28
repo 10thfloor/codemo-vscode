@@ -43,49 +43,17 @@ export default function join(streamId, streamFileName): Promise < {} > {
 			}
 
 			const streamFile = `${STREAMS_ROOT}/${streamFileName}`;
-			//let fileExists: boolean = fs.existsSync(streamFile);
 
 			mkdirp.sync(STREAMS_ROOT);
 			fs.writeFileSync(streamFile, stream.val().text);
 
 			const document = await vscode.workspace.openTextDocument(streamFile);
-			// const codemoStream = document;
 			vscode.window.showTextDocument(document, vscode.ViewColumn.Three);
 
 			const eventHandlers = new StreamEventHandler({ document, stream });
-
-			// let localEdit;
-			// const changeListenerFunction = (event) => {
-			// 	if (event.document !== codemoStream) return;
-
-			// 	const edit = event.contentChanges[0];
-			// 	localEdit = StreamEdit.save(edit);
-
-			// 	if (localEdit.hash !== remoteEdit.hash) {
-			// 		firebase.database().ref(`/streams/${stream.key}`)
-			// 			.update({
-			// 			text: codemoStream.getText(),
-			// 			lastEdit: localEdit
-			// 		})
-			// 	}
-			// }
-
 			let changeListener = vscode.workspace.onDidChangeTextDocument(eventHandlers.onEditorTextChange);
 			streamData.on('value', eventHandlers.onStreamData);
 
-
-			// let remoteEdit;
-			// streamData.on('value', async function (stream) {
-			// 	remoteEdit = stream.val().lastEdit || { hash: null };
-
-			// 	const edit = new vscode.WorkspaceEdit();
-			// 	const editor = getEditor(codemoStream);
-
-			// 	if(editor && remoteEdit.hash && remoteEdit.hash !== localEdit.hash) {
-			// 		edit.set(editor, [StreamEdit.create(remoteEdit)])
-			// 		await vscode.workspace.applyEdit(edit);
-			// 	}
-			// });
 
 			resolve({});
 		}).catch((err: any) => {
