@@ -43,7 +43,7 @@ export default function startFromFile(context): Promise < {} > {
 					const edit = event.contentChanges[0];
 
 					thisEdit = StreamEdit.save(edit);
-					localHash = thisEdit.hash;
+					localHash = thisEdit.hash
 
 					if (localHash !== lastEdit.hash) {
 						firebase.database().ref(`/streams/${stream.key}`)
@@ -62,7 +62,7 @@ export default function startFromFile(context): Promise < {} > {
 				lastEdit = stream.val().lastEdit;
 				const edit = new vscode.WorkspaceEdit();
 				const editor = getEditor(streamFile.fileName);
-				if(editor && lastEdit.hash !== localHash) {
+				if(editor && lastEdit && lastEdit.hash !== localHash) {
 					edit.set(editor, [StreamEdit.create(lastEdit)])
 					await vscode.workspace.applyEdit(edit);
 				}
