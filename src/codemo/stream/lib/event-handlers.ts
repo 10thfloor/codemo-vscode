@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as firebase from 'firebase';
+import * as _get from 'lodash.get';
 
 import StreamEdit from '../lib/stream-edit-factory';
 
@@ -39,12 +40,12 @@ class StreamEventHandler {
   }
 
   onStreamData(stream) {
-    this.remoteEdit = stream.val().lastEdit || { hash: null };
+    this.remoteEdit = stream.val().lastEdit;
 
     const edit = new vscode.WorkspaceEdit();
     const editor = this.getEditor();
 
-    if(editor && this.remoteEdit.hash && this.remoteEdit.hash !== this.localEdit.hash) {
+    if(editor && _get(this.remoteEdit, 'hash') && this.remoteEdit.hash !== _get(this.localEdit, 'hash')) {
       edit.set(editor, [StreamEdit.create(this.remoteEdit)])
       vscode.workspace.applyEdit(edit);
     }
@@ -56,7 +57,7 @@ class StreamEventHandler {
     const edit = event.contentChanges[0];
     this.localEdit = StreamEdit.save(edit);
 
-    if (this.localEdit.hash !== this.remoteEdit.hash) {
+    if (this.localEdit.hash !== _get(this.remoteEdit, 'hash')) {
       firebase.database().ref(`/streams/${this.stream.key}`)
         .update({
         text: this.codemoStream.getText(),
