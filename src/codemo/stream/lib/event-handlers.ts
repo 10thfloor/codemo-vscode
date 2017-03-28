@@ -23,20 +23,19 @@ class StreamEventHandler {
   codemoStream: vscode.TextDocument;
 
   constructor({document, stream}) {
-
     this.codemoStream = document;
     this.stream = stream;
 
-	this.onStreamData = this.onStreamData.bind(this);
-	this.onEditorTextChange = this.onEditorTextChange.bind(this);
-
+    this.onStreamData = this.onStreamData.bind(this);
+    this.onEditorTextChange = this.onEditorTextChange.bind(this);
   }
 
   getEditor() {
-    const editor = vscode.window.visibleTextEditors.filter(editor => {
+    const editor = vscode.window.visibleTextEditors.find(editor => {
       return editor.document.uri.path === this.codemoStream.fileName;
     });
-    return editor.length && editor[0].document.uri;
+
+    return _get(editor, 'document.uri');
   }
 
   onStreamData(stream) {
@@ -45,7 +44,9 @@ class StreamEventHandler {
     const edit = new vscode.WorkspaceEdit();
     const editor = this.getEditor();
 
-    if(editor && _get(this.remoteEdit, 'hash') && this.remoteEdit.hash !== _get(this.localEdit, 'hash')) {
+    if (!editor || !_get(this.remoteEdit, 'hash')) return;
+
+    if(this.remoteEdit.hash !== _get(this.localEdit, 'hash')) {
       edit.set(editor, [StreamEdit.create(this.remoteEdit)])
       vscode.workspace.applyEdit(edit);
     }
